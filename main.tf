@@ -88,4 +88,11 @@ resource "aws_eip" "ip_minecraft" {
     })
     interpreter = ["bash", "-c"]
   }
+
+  provisioner "local-exec" {
+    command = "./utils/remind"
+    interpreter = [
+      "bash", "-c"
+    ]
+  }
 }

@@ -1,0 +1,13 @@
+#!/usr/bin/env osascript -l JavaScript
+
+const RemindersApp = Application("Reminders");
+
+function run() {
+  const inTwoHours = Date.now() + 2 * 60 * 60 * 1000;
+  const dueDate = new Date(inTwoHours);
+  const reminder = RemindersApp.Reminder({
+    name: "Run terraform destroy",
+    dueDate: dueDate,
+  });
+  RemindersApp.defaultList.reminders.push(reminder);
+}
