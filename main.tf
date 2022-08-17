@@ -81,4 +81,11 @@ resource "aws_eip" "ip_minecraft" {
     })
     interpreter = ["bash", "-c"]
   }
+
+  provisioner "local-exec" {
+    command = templatefile("update_ansible_hosts.tpl", {
+      ip_address = self.public_ip,
+    })
+    interpreter = ["bash", "-c"]
+  }
 }

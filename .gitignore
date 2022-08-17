@@ -23,3 +23,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# ansible
+*.retry
+ansible/files
+hosts

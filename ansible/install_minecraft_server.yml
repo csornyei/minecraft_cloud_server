@@ -1,0 +1,45 @@
+---
+- name: Install minecraft server
+  hosts: minecraft_server
+  become: yes
+  remote_user: ubuntu
+
+  tasks:
+    - name: Add Java repository
+      apt_repository:
+        repo: ppa:openjdk-r/ppa
+        state: present
+        filename: openjdk
+        update_cache: yes
+
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
+    - name: Install Java
+      apt:
+        name: openjdk-17-jre-headless
+        state: present
+
+    - name: Download Minecraft Server
+      get_url:
+        url: https://csornyei-minecraft-server.s3.eu-central-1.amazonaws.com/minecraft_server.zip
+        dest: /home/ubuntu/minecraft_server.zip
+
+    - name: Unzip Download Server
+      become_method: sudo
+      command: unzip -o minecraft_server.zip -d /home/ubuntu/minecraft_server
+
+    - name: Copy service file to /etc/systemd/system
+      copy:
+        remote_src: yes
+        src: /home/ubuntu/minecraft_server/minecraft-server.service
+        dest: /etc/systemd/system/minecraft-server.service
+
+    - name: Start minecraft service
+      service:
+        name: minecraft-server
+        state: started
+
+    # create a script to save the server to s3 when the instance is terminating
