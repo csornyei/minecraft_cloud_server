@@ -51,20 +51,18 @@ resource "aws_key_pair" "minecraft_auth" {
   public_key = file("/Users/matecsornyei/.ssh/aws_dev_env_key.pub")
 }
 
-resource "aws_instance" "minecraft_node" {
-  instance_type = "t2.micro"
-  ami           = data.aws_ami.server_ami.id
-  key_name      = aws_key_pair.minecraft_auth.key_name
+resource "aws_spot_instance_request" "minecraft_node_request" {
+  ami                  = data.aws_ami.server_ami.id
+  spot_price           = "0.05"
+  instance_type        = "t3.medium"
+  spot_type            = "one-time"
+  wait_for_fulfillment = true
+  key_name             = aws_key_pair.minecraft_auth.key_name
   vpc_security_group_ids = [
     aws_security_group.minecraft_ingress_ssh_sec_group.id,
-    aws_security_group.minecraft_ingress_http_sec_group.id,
     aws_security_group.minecraft_ingress_mc_server_sec_group.id
   ]
   subnet_id = aws_subnet.minecraft_public_subnet.id
-
-  root_block_device {
-    volume_size = 10
-  }
 
   tags = {
     "Name" = "minecraft-node"
@@ -72,7 +70,7 @@ resource "aws_instance" "minecraft_node" {
 }
 
 resource "aws_eip" "ip_minecraft" {
-  instance = aws_instance.minecraft_node.id
+  instance = aws_spot_instance_request.minecraft_node_request.spot_instance_id
   vpc      = true
 
   provisioner "local-exec" {
