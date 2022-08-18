@@ -9,6 +9,6 @@ data "aws_ami" "server_ami" {
 }
 
 data "aws_route53_zone" "csornyeicom" {
-  name         = "csornyei.com"
+  name         = var.route53_zone_name
   private_zone = false
 }

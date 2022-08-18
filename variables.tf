@@ -8,6 +8,11 @@ variable "instance_type" {
   default = "t3.medium"
 }
 
+variable "route53_zone_name" {
+  type    = string
+  default = "csornyei.com"
+}
+
 variable "url" {
   type    = string
   default = "minecraft.csornyei.com"

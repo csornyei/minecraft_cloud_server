@@ -56,7 +56,7 @@
 
     - name: Download Minecraft Server
       get_url:
-        url: https://csornyei-minecraft-server.s3.eu-central-1.amazonaws.com/minecraft_server.zip
+        url: https://csornyeicom-minecraft-server.s3.eu-central-1.amazonaws.com/minecraft_server.zip
         dest: /home/ubuntu/minecraft_server.zip
 
     - name: Unzip server
@@ -80,3 +80,8 @@
         remote_src: yes
         src: /home/ubuntu/minecraft_server/minecraft-server.service
         dest: /etc/systemd/system/minecraft-server.service
+
+    - name: Start minecraft server service
+      service:
+        name: minecraft-server.service
+        state: started

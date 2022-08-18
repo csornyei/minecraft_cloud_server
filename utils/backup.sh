@@ -1,5 +1,5 @@
 #!/bin/sh
-bucket="csornyei-minecraft-server"
+bucket="csornyeicom-minecraft-server"
 
 file=/home/ubuntu/minecraft_server.zip
 
