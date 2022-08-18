@@ -54,7 +54,7 @@ resource "aws_key_pair" "minecraft_auth" {
 resource "aws_spot_instance_request" "minecraft_node_request" {
   ami                  = data.aws_ami.server_ami.id
   spot_price           = "0.05"
-  instance_type        = "t3.medium"
+  instance_type        = var.instance_type
   spot_type            = "one-time"
   wait_for_fulfillment = true
   key_name             = aws_key_pair.minecraft_auth.key_name
@@ -72,15 +72,9 @@ resource "aws_spot_instance_request" "minecraft_node_request" {
 resource "aws_eip" "ip_minecraft" {
   instance = aws_spot_instance_request.minecraft_node_request.spot_instance_id
   vpc      = true
-
-  provisioner "local-exec" {
-    command = templatefile("ssh-config.tpl", {
-      hostname     = self.public_ip,
-      user         = "ubuntu"
-      identityFile = "~/.ssh/aws_dev_env_key"
-    })
-    interpreter = ["bash", "-c"]
-  }
+  depends_on = [
+    aws_spot_instance_request.minecraft_node_request
+  ]
 
   provisioner "local-exec" {
     command = templatefile("update_ansible_hosts.tpl", {
@@ -94,5 +88,22 @@ resource "aws_eip" "ip_minecraft" {
     interpreter = [
       "bash", "-c"
     ]
+  }
+}
+
+resource "aws_route53_record" "minecraft_record" {
+  zone_id = data.aws_route53_zone.csornyeicom.zone_id
+  name    = var.url
+  type    = "A"
+  ttl     = 60
+  records = [aws_eip.ip_minecraft.public_ip]
+
+  provisioner "local-exec" {
+    command = templatefile("ssh-config.tpl", {
+      hostname     = self.name,
+      user         = "ubuntu"
+      identityFile = "~/.ssh/aws_dev_env_key"
+    })
+    interpreter = ["bash", "-c"]
   }
 }

@@ -27,3 +27,5 @@ terraform.rc
 *.retry
 ansible/files
 hosts
+config
+credentials
