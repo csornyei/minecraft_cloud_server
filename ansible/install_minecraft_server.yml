@@ -3,7 +3,6 @@
   hosts: minecraft_server
   become: yes
   remote_user: ubuntu
-
   tasks:
     - name: Add Java repository
       apt_repository:
@@ -17,6 +16,39 @@
         name: unzip
         state: present
 
+    - name: Install zip
+      apt:
+        name: zip
+        state: present
+
+    - name: Install AWS CLI
+      get_url:
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /home/ubuntu/awscliv2.zip
+
+    - name: Unzip AWS CLI
+      become_method: sudo
+      command: unzip -o /home/ubuntu/awscliv2.zip -d /home/ubuntu/awscliv2
+
+    - name: Install AWS CLI
+      become_method: sudo
+      command: /home/ubuntu/awscliv2/aws/install
+
+    - name: Create .aws folder
+      file:
+        path: /home/ubuntu/.aws
+        state: directory
+
+    - name: Copy credentials
+      copy:
+        src: ./credentials
+        dest: /home/ubuntu/.aws/credentials
+
+    - name: Copy config
+      copy:
+        src: ./config
+        dest: /home/ubuntu/.aws/config
+
     - name: Install Java
       apt:
         name: openjdk-17-jre-headless
@@ -27,19 +59,24 @@
         url: https://csornyei-minecraft-server.s3.eu-central-1.amazonaws.com/minecraft_server.zip
         dest: /home/ubuntu/minecraft_server.zip
 
-    - name: Unzip Download Server
+    - name: Unzip server
       become_method: sudo
       command: unzip -o minecraft_server.zip -d /home/ubuntu/minecraft_server
 
-    - name: Copy service file to /etc/systemd/system
+    - name: Delete zipped server
+      become_method: sudo
+      file:
+        path: /home/ubuntu/minecraft_server.zip
+        state: absent
+
+    - name: Add +x permission to backup.sh
+      become_method: sudo
+      file:
+        dest: /home/ubuntu/minecraft_server/backup.sh
+        mode: a+x
+
+    - name: Copy server service file to /etc/systemd/system
       copy:
         remote_src: yes
         src: /home/ubuntu/minecraft_server/minecraft-server.service
         dest: /etc/systemd/system/minecraft-server.service
-
-    - name: Start minecraft service
-      service:
-        name: minecraft-server
-        state: started
-
-    # create a script to save the server to s3 when the instance is terminating
