@@ -53,7 +53,7 @@ resource "aws_key_pair" "minecraft_auth" {
 
 resource "aws_spot_instance_request" "minecraft_node_request" {
   ami                  = data.aws_ami.server_ami.id
-  spot_price           = "0.05"
+  spot_price           = "0.033"
   instance_type        = var.instance_type
   spot_type            = "one-time"
   wait_for_fulfillment = true

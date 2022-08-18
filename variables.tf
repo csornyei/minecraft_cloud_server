@@ -5,7 +5,7 @@ variable "sec_group_cidr_block" {
 
 variable "instance_type" {
   type    = string
-  default = "t3.medium"
+  default = "t3.large"
 }
 
 variable "route53_zone_name" {
