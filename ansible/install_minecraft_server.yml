@@ -61,7 +61,7 @@
 
     - name: Unzip server
       become_method: sudo
-      command: unzip -o minecraft_server.zip -d /home/ubuntu/minecraft_server
+      command: unzip -o minecraft_server.zip -d /home/ubuntu
 
     - name: Delete zipped server
       become_method: sudo
